@@ -6,6 +6,18 @@ namespace Smoothing
 
     public static class SES
     {
+        public static double[] ForeCast(double[] values, double alpha, int left, int right) {
+            double[] forecast = new double[values.Length + right - left + 1];
+            Smooth(values, alpha).CopyTo(forecast, 0);
+            double s1 = values.Take(12).Average();
+            double Sn = calculateSmoothing(alpha, values, values.Length, s1);
+
+            for(int i = left; i <= right; i++) {
+                forecast[i - 1] = Sn;
+            }
+
+            return forecast;
+        }
         public static double FindBestAlpha(double[] values, double stepSize) {
             double currentBestAlpha = 0;
             double currentBestSquaredError = double.MaxValue;

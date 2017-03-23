@@ -14,7 +14,7 @@ namespace Smoothing
             // var smoothedValues = Smooth(values, alpha, beta);
             int n = values.Length;
             double[] forecast = new double[n + end-start + 1];
-            values.CopyTo(forecast, 0);                        
+            Smooth(values, alpha, beta).CopyTo(forecast, 0);                        
             double Sn = CalculateSmoothing(values, alpha, beta, n - 1);
             double Bn = CalculateBeta(beta, alpha, values, n - 1);
 

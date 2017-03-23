@@ -4,7 +4,10 @@ using System.IO;
 using Smoothing;
 using System.Collections.Generic;
 using System.Linq;
+// using Gtk;
 using System.Threading.Tasks;
+using MyClient;
+
 
 namespace prediction
 {
@@ -19,24 +22,45 @@ namespace prediction
             .ToDictionary(y => double.Parse(y[0]), y => double.Parse(y[1]));
 
             var points = data.Values.ToArray();
-            // var smoothedPoints = DES.Smooth(points, 0.6, 0.6);
-            var best = DES.FindBestAlphaBeta(points, 0.1);
-            Console.WriteLine("Best Alpha: " + best.Item1 + " Best Beta: " + best.Item2);
+            var bestDES = DES.FindBestAlphaBeta(points, 0.1);
+            var forecastDES = DES.ForeCast(points, 37, 48, bestDES.Item1, bestDES.Item2);
+            var besSES = SES.FindBestAlpha(points, 0.01);
+            var forecastSES = SES.ForeCast(points, besSES, 37, 48);
 
-            var forecast = DES.ForeCast(points, 37, 48, best.Item1, best.Item2);
+            string original = "[";
 
-            foreach (var num in forecast)
+            foreach (var num in points)
             {
-                Console.WriteLine(num);
+                original+= num + ",";
             }
+            original += "]";
+            
+            string desforecastDES = "[";
 
+            foreach (var num in forecastDES)
+            {
+                desforecastDES+= num + ",";
+            }
+            desforecastDES += "]";
 
-            var i = 0;
-            // foreach (var point in smoothedPoints)
-            // {
-            //     Console.WriteLine(i + ": " + point);
-            //     i++;
-            // }
+            string desforecastSES = "[";
+
+            foreach (var num in forecastSES)
+            {
+                desforecastSES+= num + ",";
+            }
+            desforecastSES += "]";
+
+            var list = "[" + original + "," + desforecastDES + ","+desforecastSES+ "]";
+            // var i = 0;
+            // // foreach (var point in smoothedPoints)
+            // // {
+            // //     Console.WriteLine(i + ": " + point);
+            // //     i++;
+            // // }
+            var socket = new Client_Socket();
+            socket.Publish(list);
+        
 
         }
     }
